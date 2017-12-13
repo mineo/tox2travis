@@ -114,7 +114,7 @@ def travis_yml_header():
     """Return the .travis.yml header."""
     return dedent("""\
     language: python
-    cache:pip
+    cache: pip
     matrix:
       include:
     """)
