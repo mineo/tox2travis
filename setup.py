@@ -20,6 +20,10 @@ setup(name="tox2travis",
       description="Automatically generate .travis.yml from tox.ini",
       long_description=open("README.txt", encoding="utf-8").read(),
       install_requires=["click", "tox"],
+      entry_points='''
+      [console_scripts]
+      tox2travis=tox2travis.__main__:main
+      ''',
       setup_requires=["setuptools_scm"],
       use_scm_version={"write_to": "tox2travis/version.py"},
       extras_require={
