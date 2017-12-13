@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+from __future__ import print_function
+from codecs import open
+from setuptools import setup
+
+
+setup(name="tox2travis",
+      author="Wieland Hoffmann",
+      author_email="themineo@gmail.com",
+      packages=["tox2travis"],
+      package_dir={"tox2travis": "tox2travis"},
+      download_url="https://github.com/mineo/tox2travis/tarball/master",
+      url="http://github.com/mineo/tox2travis",
+      license="MIT",
+      classifiers=["Development Status :: 4 - Beta",
+                   "License :: OSI Approved :: MIT License",
+                   "Natural Language :: English",
+                   "Operating System :: OS Independent",
+                   "Programming Language :: Python :: 2.7"],
+      description="Automatically generate .travis.yml from tox.ini",
+      long_description=open("README.txt", encoding="utf-8").read(),
+      setup_requires=["setuptools_scm"],
+      use_scm_version={"write_to": "tox2travis/version.py"},
+      extras_require={
+          'docs': ['sphinx']
+      }
+      )

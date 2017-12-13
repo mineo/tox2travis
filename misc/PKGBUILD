@@ -1,0 +1,21 @@
+pkgname=tox2travis-git
+pkgver=1
+pkgrel=1
+pkgdesc=""
+arch=("any")
+url="https://github.com/mineo/tox2travis"
+license=('MIT')
+source=('git+https://github.com/mineo/tox2travis')
+md5sums=('SKIP')
+depends=('python3')
+makedepends=('git')
+
+pkgver(){
+  cd "${srcdir}/tox2travis"
+  printf "%s" "$(git describe --long | sed 's/\([^-]*-\)g/r\1/;s/-/./g')"
+}
+
+package() {
+  cd "${srcdir}/tox2travis"
+  python3 setup.py install --root="$pkgdir" --optimize=1
+}
