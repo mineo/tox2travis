@@ -63,7 +63,7 @@ TOX_CPYTHONS = ["2.7", "3.4", "3.5", "3.6", "3.7"]
 #: All Jython versions known to tox
 TOX_JYTHONS  = ["jython"]  # noqa: E221
 #: All pypy versions known to tox
-TOX_PYPYS    = ["pypy", "pyp3"]  # noqa: E221
+TOX_PYPYS    = ["pypy", "pypy3"]  # noqa: E221
 
 ALL_KNOWN_BASEPYTHONS = [
     BasePython("python{version}".format(version=version), version)
