@@ -1,5 +1,5 @@
 language: python
-cache:pip
+cache: pip
 matrix:
   include:
   - python: 2.7
