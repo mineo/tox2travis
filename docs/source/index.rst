@@ -1,5 +1,5 @@
 Welcome to tox2travis's documentation!
-================================
+======================================
 
 Contents:
 
@@ -20,4 +20,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
