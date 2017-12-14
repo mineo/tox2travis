@@ -22,7 +22,7 @@ You can easily clone the code with git::
 
 Now you can start hacking on the code or install it system-wide::
 
-    python2 setup.py install
+    python3 setup.py install
 
 Setup
 -----
