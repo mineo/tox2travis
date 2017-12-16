@@ -92,12 +92,17 @@ ALL_KNOWN_BASEPYTHONS.extend(TOX_DEVPTHONS)
 #: All strings that can be used as a fallback
 ALL_VALID_FALLBACKS = [python.tox_version for python in ALL_KNOWN_BASEPYTHONS]
 
-def get_all_environments():
+
+def get_all_environments(toxini=None):
     """Get a list of all tox environments.
 
+    :type toxini: str
     :rtype: [tox.config.TestenvConfig]
     """
-    config = parseconfig([])
+    if toxini is None:
+        config = parseconfig([])
+    else:
+        config = parseconfig(["-c", toxini])
     envconfigs = sorted(config.envconfigs.values(), key=lambda e: e.envname)
     return envconfigs
 
