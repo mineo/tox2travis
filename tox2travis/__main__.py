@@ -3,6 +3,7 @@
 # Copyright © 2017 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import click
+import logging
 
 
 from .tox2travis import (generate_matrix_specification, get_all_environments,
@@ -13,8 +14,14 @@ from .tox2travis import (generate_matrix_specification, get_all_environments,
 @click.command()
 @click.option("--fallback-python", type=click.Choice(
     python.tox_version for python in ALL_KNOWN_BASEPYTHONS))
+@click.option("--verbose", is_flag=True)
 @click.argument("outfile", type=click.File("w"))
-def main(fallback_python, outfile):  # noqa: D103
+def main(fallback_python, verbose, outfile):  # noqa: D103
+    if verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
     envs = get_all_environments()
     basepythons = fill_basepythons(envs, fallback_python)
 
