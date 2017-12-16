@@ -81,6 +81,8 @@ ALL_KNOWN_BASEPYTHONS.extend(BasePython(version, version)
                              for version in TOX_PYPYS)
 ALL_KNOWN_BASEPYTHONS.extend(TOX_DEVPTHONS)
 
+#: All strings that can be used as a fallback
+ALL_VALID_FALLBACKS = [python.tox_version for python in ALL_KNOWN_BASEPYTHONS]
 
 def get_all_environments():
     """Get a list of all tox environments.

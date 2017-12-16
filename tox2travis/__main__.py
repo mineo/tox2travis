@@ -8,12 +8,11 @@ import logging
 
 from .tox2travis import (generate_matrix_specification, get_all_environments,
                          fill_basepythons, travis_yml_header, travis_yml_footer,
-                         ALL_KNOWN_BASEPYTHONS)
+                         ALL_VALID_FALLBACKS)
 
 
 @click.command()
-@click.option("--fallback-python", type=click.Choice(
-    python.tox_version for python in ALL_KNOWN_BASEPYTHONS))
+@click.option("--fallback-python", type=click.Choice(ALL_VALID_FALLBACKS))
 @click.option("--verbose", is_flag=True)
 @click.argument("outfile", type=click.File("w"))
 def main(fallback_python, verbose, outfile):  # noqa: D103
