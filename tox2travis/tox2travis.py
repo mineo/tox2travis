@@ -32,11 +32,19 @@ class BasePython:
 
     def add_environment(self, environment):
         """Add a new environment to this python version.
+
         :param self:
         :param environment:
         """
         if environment not in self._environments:
             self._environments.append(environment)
+
+    def _clear_environments(self):
+        """Clear the list of environments associated with this python version.
+
+        :param self:
+        """
+        self._environments.clear()
 
     @property
     def environments(self):
