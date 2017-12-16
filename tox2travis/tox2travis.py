@@ -59,11 +59,13 @@ class BasePython:
 #   pypy
 #   pypy3
 #: All CPython versions known to tox
-TOX_CPYTHONS = ["2.7", "3.4", "3.5", "3.6", "3.7"]
+TOX_CPYTHONS = ["2.7", "3.4", "3.5", "3.6"]
 #: All Jython versions known to tox
 TOX_JYTHONS  = ["jython"]  # noqa: E221
 #: All pypy versions known to tox
 TOX_PYPYS    = ["pypy", "pypy3"]  # noqa: E221
+#: All Python development versions supported by tox and travis
+TOX_DEVPTHONS = [BasePython("python3.7", "3.7-dev")]
 
 ALL_KNOWN_BASEPYTHONS = [
     BasePython("python{version}".format(version=version), version)
@@ -74,6 +76,7 @@ ALL_KNOWN_BASEPYTHONS.extend(BasePython(version, version)
                              for version in TOX_JYTHONS)
 ALL_KNOWN_BASEPYTHONS.extend(BasePython(version, version)
                              for version in TOX_PYPYS)
+ALL_KNOWN_BASEPYTHONS.extend(TOX_DEVPTHONS)
 
 
 def get_all_environments():
