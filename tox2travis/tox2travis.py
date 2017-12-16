@@ -84,7 +84,7 @@ def get_all_environments():
 
     :rtype: [tox.config.TestenvConfig]
     """
-    config = parseconfig()
+    config = parseconfig([])
     return config.envconfigs.values()
 
 
