@@ -2,6 +2,9 @@
 # coding: utf-8
 # Copyright © 2017 Wieland Hoffmann
 # License: MIT, see LICENSE for details
+import logging
+
+
 from textwrap import dedent, indent
 from tox.config import parseconfig
 
@@ -106,10 +109,16 @@ def fill_basepythons(envconfigs, fallback_basepython=None):  # noqa: D400
     for envconfig in envconfigs:
         basepython = envconfig.basepython
         if basepython in all_basepythons:
-            basepythons[basepython].add_environment(envconfig)
+            bp = basepythons[basepython]
+            logging.debug("%s uses %s (%s)", envconfig.envname, basepython,
+                          bp.travis_version)
+            bp.add_environment(envconfig)
         else:
             if fallback_basepython is not None:
-                basepythons[fallback_basepython].add_environment(envconfig)
+                bp = basepythons[fallback_basepython]
+                logging.debug("%s uses %s (fallback: %s)", envconfig.envname,
+                              basepython, bp.travis_version)
+                bp.add_environment(envconfig)
 
     return basepythons.values()
 
