@@ -85,7 +85,8 @@ def get_all_environments():
     :rtype: [tox.config.TestenvConfig]
     """
     config = parseconfig([])
-    return config.envconfigs.values()
+    envconfigs = sorted(config.envconfigs.values(), key=lambda e: e.envname)
+    return envconfigs
 
 
 def fill_basepythons(envconfigs, fallback_basepython=None):  # noqa: D400
