@@ -174,7 +174,7 @@ def generate_specs_for_basepython(basepython):
     """Return the matrix entries for `basepython`.
 
     :type basepython: BasePython
-    :rtype: str
+    :rtype: [str]
     """
     single_entry_spec = dedent("""\
     - python: {python}
