@@ -69,9 +69,9 @@ class BasePython:
 #   jython
 #   pypy
 #   pypy3
-#   py26 also still works
+#   py26, py32 and py33 also still work
 #: All CPython versions known to tox
-TOX_CPYTHONS = ["2.6", "2.7", "3.4", "3.5", "3.6"]
+TOX_CPYTHONS = ["2.6", "2.7", "3.2", "3.3", "3.4", "3.5", "3.6"]
 #: All Jython versions known to tox
 TOX_JYTHONS  = ["jython"]  # noqa: E221
 #: All pypy versions known to tox
