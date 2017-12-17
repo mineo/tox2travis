@@ -7,8 +7,8 @@ url="https://github.com/mineo/tox2travis"
 license=('MIT')
 source=('git+https://github.com/mineo/tox2travis')
 md5sums=('SKIP')
-depends=('python3')
-makedepends=('git')
+depends=('python3' 'python-click' 'python-tox')
+makedepends=('git' 'python-setuptools-scm')
 
 pkgver(){
   cd "${srcdir}/tox2travis"

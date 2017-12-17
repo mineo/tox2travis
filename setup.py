@@ -24,9 +24,10 @@ setup(name="tox2travis",
       [console_scripts]
       tox2travis=tox2travis.__main__:main
       ''',
-      setup_requires=["setuptools_scm"],
+      setup_requires=["setuptools_scm", "pytest-runner"],
       use_scm_version={"write_to": "tox2travis/version.py"},
       extras_require={
           'docs': ['sphinx']
-      }
+      },
+      tests_require=["pytest"]
       )
