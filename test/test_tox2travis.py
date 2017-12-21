@@ -56,5 +56,11 @@ def test_fallback_is_used(tmpdir, fallback):
     for bp in basepythons:
         if bp.tox_version == fallback:
             assert bp.environments[0].envname == "flake8"
-        else:
-            assert len(bp.environments) == 0
+            break
+    else:
+        pytest.fail("Did not find the fallback BasePython")
+
+    for bp in basepythons:
+        if bp.tox_version == fallback:
+            continue
+        assert len(bp.environments) == 0
