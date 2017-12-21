@@ -70,6 +70,11 @@ class BasePython:
 #   pypy
 #   pypy3
 #   py26, py32 and py33 also still work
+#
+# This list could also be generated from tox.config.default_factors, but not
+# all of the map directly to a version of python supported by travis (for
+# example py37/python3.7 should map to "3.7-dev" at the time of this writing).
+
 #: All CPython versions known to tox
 TOX_CPYTHONS = ["2.6", "2.7", "3.2", "3.3", "3.4", "3.5", "3.6"]
 #: All Jython versions known to tox
