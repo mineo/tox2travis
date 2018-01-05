@@ -186,7 +186,7 @@ def generate_specs_for_basepython(basepython):
     :rtype: [str]
     """
     single_entry_spec = dedent("""\
-    - python: {python}
+    - python: "{python}"
       env: TOXENV={toxenv}
     """)
     travis_version = basepython.travis_version
