@@ -107,3 +107,52 @@ def test_simple_case(basepython):
         includes = content["matrix"]["include"]
         expected = [{"env": "TOXENV=test", "python": basepython.travis_version}]
         assert expected == includes
+
+
+@pytest.mark.parametrize("custom_target1", (tox2travis.TOX_CPYTHONS +
+                                            tox2travis.TOX_JYTHONS +
+                                            tox2travis.TOX_PYPYS +
+                                            ["python_version_not_in_travis"]))
+@pytest.mark.parametrize("custom_target2", (tox2travis.TOX_CPYTHONS +
+                                            tox2travis.TOX_JYTHONS +
+                                            tox2travis.TOX_PYPYS +
+                                            ["python_version_not_in_travis"]))
+def test_custom_mapping(custom_target1, custom_target2):
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        this_dir = Path(getcwd())
+        get_toxini_path_with_content(this_dir, dedent("""\
+        [tox]
+        envlist = flake8,test
+        [testenv:flake8]
+        basepython=pythonsomething.something
+        [testenv:test]
+        basepython=pythonsomething.somethingelse
+        """))
+
+        result = runner.invoke(main, [_travis_yml_name])
+        assert result.exit_code == 0, result.output
+        content = load_travis_yml(this_dir)
+        includes = content["matrix"]["include"]
+        assert includes is None, includes
+
+        result = runner.invoke(main, ["--custom-mapping",
+                                      "pythonsomething.something",
+                                      custom_target1,
+                                      "--custom-mapping",
+                                      "pythonsomething.somethingelse",
+                                      custom_target2,
+                                      _travis_yml_name])
+
+        assert result.exit_code == 0, result.output
+
+        content = load_travis_yml(this_dir)
+        includes = content["matrix"]["include"]
+        assert includes is not None, content
+        assert len(includes) == 2, includes
+
+        expected = [{"env": "TOXENV=flake8", "python": custom_target1},
+                    {"env": "TOXENV=test", "python": custom_target2}]
+
+        assert expected == includes
