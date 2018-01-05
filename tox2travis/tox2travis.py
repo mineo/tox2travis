@@ -99,6 +99,10 @@ ALL_KNOWN_BASEPYTHONS.extend(TOX_DEVPTHONS)
 ALL_VALID_FALLBACKS = [python.tox_version for python in ALL_KNOWN_BASEPYTHONS]
 
 
+#: The default travis YAML file name
+TRAVIS_YAML = ".travis.yml"
+
+
 def get_all_environments(toxini=None):
     """Get a list of all tox environments.
 

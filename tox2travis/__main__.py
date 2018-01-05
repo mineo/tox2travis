@@ -8,7 +8,8 @@ import logging
 
 from .tox2travis import (generate_matrix_specification, get_all_environments,
                          fill_basepythons, travis_yml_header, travis_yml_footer,
-                         ALL_VALID_FALLBACKS, BasePython, ALL_KNOWN_BASEPYTHONS)
+                         ALL_VALID_FALLBACKS, BasePython, ALL_KNOWN_BASEPYTHONS,
+                         TRAVIS_YAML)
 from copy import deepcopy
 
 
@@ -16,7 +17,7 @@ from copy import deepcopy
 @click.option("--custom-mapping", nargs=2, multiple=True)
 @click.option("--fallback-python", type=click.Choice(ALL_VALID_FALLBACKS))
 @click.option("--verbose", is_flag=True)
-@click.argument("outfile", type=click.File("w"))
+@click.argument("outfile", type=click.File("w"), default=TRAVIS_YAML)
 def main(custom_mapping, fallback_python, verbose, outfile):  # noqa: D103
     if verbose:
         logging.basicConfig(level=logging.DEBUG)

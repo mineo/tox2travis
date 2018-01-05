@@ -15,9 +15,6 @@ from tox2travis import tox2travis
 from tox2travis.__main__ import main
 
 
-_travis_yml_name = ".travis.yml"
-
-
 def write_toxini(tmpdir, content):
     """
     :type directory: py.path.local
@@ -32,7 +29,7 @@ def load_travis_yml(tmpdir):
     """
     :param str tmpdir:
     """
-    filename = join(tmpdir, _travis_yml_name)
+    filename = join(tmpdir, tox2travis.TRAVIS_YAML)
     with open(filename, "r") as fp:
         return yaml.load(fp)
 
@@ -100,7 +97,7 @@ def test_simple_case(basepython):
         basepython={python}
         """.format(python=basepython.tox_version)))
 
-        result = runner.invoke(main, [_travis_yml_name])
+        result = runner.invoke(main)
         assert result.exit_code == 0, result.output
 
         content = load_travis_yml(this_dir)
@@ -131,7 +128,7 @@ def test_custom_mapping(custom_target1, custom_target2):
         basepython=pythonsomething.somethingelse
         """))
 
-        result = runner.invoke(main, [_travis_yml_name])
+        result = runner.invoke(main)
         assert result.exit_code == 0, result.output
         content = load_travis_yml(this_dir)
         includes = content["matrix"]["include"]
@@ -142,8 +139,7 @@ def test_custom_mapping(custom_target1, custom_target2):
                                       custom_target1,
                                       "--custom-mapping",
                                       "pythonsomething.somethingelse",
-                                      custom_target2,
-                                      _travis_yml_name])
+                                      custom_target2])
 
         assert result.exit_code == 0, result.output
 
