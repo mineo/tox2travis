@@ -39,20 +39,24 @@ def test_get_all_environments_sorts(tmpdir):
     assert actual_basepythons == expected_basepythons
 
 
-def test_unkown_fallback_raises():
+def test_unkown_fallback_raises(basepythons):
     invalid_fallback_name = "this_is_not_a_valid_python"
     with pytest.raises(ValueError, match=f"{invalid_fallback_name} .*"):
-        tox2travis.fill_basepythons([], fallback_basepython=invalid_fallback_name)  # noqa: E501
+        tox2travis.fill_basepythons(basepythons,
+                                    [],
+                                    fallback_basepython=invalid_fallback_name)
 
 
 @pytest.mark.parametrize("fallback", tox2travis.ALL_VALID_FALLBACKS)
-def test_fallback_is_used(tmpdir, fallback):
+def test_fallback_is_used(basepythons, tmpdir, fallback):
     toxini = get_toxini_path_with_content(tmpdir, dedent("""\
     [tox]
     envlist = flake8
     """))
     configs = tox2travis.get_all_environments(toxini)
-    basepythons = tox2travis.fill_basepythons(configs, fallback)
+    basepythons = tox2travis.fill_basepythons(basepythons,
+                                              configs,
+                                              fallback)
     for bp in basepythons:
         if bp.tox_version == fallback:
             assert bp.environments[0].envname == "flake8"

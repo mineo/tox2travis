@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Copyright © 2017 Wieland Hoffmann
+# Copyright © 2017, 2018 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import logging
 
@@ -113,14 +113,17 @@ def get_all_environments(toxini=None):
     return envconfigs
 
 
-def fill_basepythons(envconfigs, fallback_basepython=None):  # noqa: D400
+def fill_basepythons(basepythons, envconfigs, fallback_basepython=None):  # noqa: D400, E501
     """Return a list of :type:`BasePython` objects with their environments
     populated from `envconfigs.
 
+    :type basepythons: [BasePython]
+    :type envconfigs: [tox.config.TestenvConfig]
+    :type fallback_basepython: str
     :rtype: [BasePython]
     """
     basepythons = {basepython.tox_version: basepython
-                   for basepython in ALL_KNOWN_BASEPYTHONS}
+                   for basepython in basepythons}
     all_basepythons = basepythons.keys()
 
     if (fallback_basepython is not None and
@@ -141,7 +144,7 @@ def fill_basepythons(envconfigs, fallback_basepython=None):  # noqa: D400
                               basepython, bp.travis_version)
                 bp.add_environment(envconfig)
 
-    return basepythons.values()
+    return list(basepythons.values())
 
 
 def travis_yml_header():
