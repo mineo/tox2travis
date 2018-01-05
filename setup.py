@@ -29,5 +29,5 @@ setup(name="tox2travis",
       extras_require={
           'docs': ['sphinx']
       },
-      tests_require=["pytest"]
+      tests_require=["pytest", "pyyaml"]
       )

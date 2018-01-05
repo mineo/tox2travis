@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright © 2017 Wieland Hoffmann
+# Copyright © 2017, 2018 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import pytest
+import yaml
 
 
-from os import fspath
+from click.testing import CliRunner
+from os import fspath, getcwd
+from os.path import join
+from pathlib import Path
 from textwrap import dedent
 from tox2travis import tox2travis
+from tox2travis.__main__ import main
+
+
+_travis_yml_name = ".travis.yml"
 
 
 def write_toxini(tmpdir, content):
@@ -18,6 +26,15 @@ def write_toxini(tmpdir, content):
     file_ = tmpdir / "tox.ini"
     file_.write_text(content, "utf-8")
     return file_
+
+
+def load_travis_yml(tmpdir):
+    """
+    :param str tmpdir:
+    """
+    filename = join(tmpdir, _travis_yml_name)
+    with open(filename, "r") as fp:
+        return yaml.load(fp)
 
 
 def get_toxini_path_with_content(tmpdir, content):
@@ -68,3 +85,25 @@ def test_fallback_is_used(basepythons, tmpdir, fallback):
         if bp.tox_version == fallback:
             continue
         assert len(bp.environments) == 0
+
+
+@pytest.mark.parametrize("basepython", tox2travis.ALL_KNOWN_BASEPYTHONS)
+def test_simple_case(basepython):
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        this_dir = Path(getcwd())
+        get_toxini_path_with_content(this_dir, dedent("""\
+        [tox]
+        envlist = test
+        [testenv:test]
+        basepython={python}
+        """.format(python=basepython.tox_version)))
+
+        result = runner.invoke(main, [_travis_yml_name])
+        assert result.exit_code == 0, result.output
+
+        content = load_travis_yml(this_dir)
+        includes = content["matrix"]["include"]
+        expected = [{"env": "TOXENV=test", "python": basepython.travis_version}]
+        assert expected == includes
