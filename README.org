@@ -1,4 +1,6 @@
 #+OPTIONS: toc:nil html-postamble:nil num:nil
+[[https://travis-ci.org/mineo/tox2travis][https://travis-ci.org/mineo/tox2travis.svg?branch=master]]
+
 * tox2travis
 
 [[https://tox2travis.rtfd.org][Documentation]]
