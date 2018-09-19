@@ -15,12 +15,12 @@ from tox2travis import tox2travis
 from tox2travis.__main__ import main
 
 
-def write_toxini(tmpdir, content):
+def write_file(tmpdir, filename, content):
     """
     :type directory: py.path.local
     :type content: str
     """
-    file_ = tmpdir / "tox.ini"
+    file_ = tmpdir / filename
     file_.write_text(content, "utf-8")
     return file_
 
@@ -39,7 +39,7 @@ def get_toxini_path_with_content(tmpdir, content):
     :type tmpdir: py.path.local
     :type content: str
     """
-    return fspath(write_toxini(tmpdir, content))
+    return fspath(write_file(tmpdir, "tox.ini", content))
 
 
 def test_get_all_environments_sorts(tmpdir):
