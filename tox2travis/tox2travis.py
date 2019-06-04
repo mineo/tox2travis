@@ -160,6 +160,7 @@ def travis_yml_header():
     return dedent("""\
     language: python
     cache: pip
+    dist: xenial
     matrix:
       include:
     """)
