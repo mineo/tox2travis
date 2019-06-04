@@ -83,8 +83,9 @@ class BasePython:
 TOX_CPYTHONS = ["2.6", "2.7", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7"]
 #: All Jython versions known to tox
 TOX_JYTHONS  = ["jython"]  # noqa: E221
-#: All pypy versions known to tox
-TOX_PYPYS    = ["pypy", "pypy3"]  # noqa: E221
+#: All pypy versions known to tox and travis
+# https://docs.travis-ci.com/user/reference/xenial/#python-support
+TOX_PYPYS    = [BasePython("pypy", "pypy2.7-6.0"), BasePython("pypy2", "pypy2.7-6.0"), BasePython("pypy3", "pypy3.5-6.0")]  # noqa: E221,E501
 #: All Python development versions supported by tox and travis
 TOX_DEVPTHONS = [BasePython("python3.8", "3.8-dev")]
 
@@ -95,8 +96,7 @@ ALL_KNOWN_BASEPYTHONS = [
 
 ALL_KNOWN_BASEPYTHONS.extend(BasePython(version, version)
                              for version in TOX_JYTHONS)
-ALL_KNOWN_BASEPYTHONS.extend(BasePython(version, version)
-                             for version in TOX_PYPYS)
+ALL_KNOWN_BASEPYTHONS.extend(TOX_PYPYS)
 ALL_KNOWN_BASEPYTHONS.extend(TOX_DEVPTHONS)
 
 #: All strings that can be used as a fallback
