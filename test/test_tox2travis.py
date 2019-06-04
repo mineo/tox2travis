@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright © 2017, 2018 Wieland Hoffmann
+# Copyright © 2017, 2018, 2019 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import pytest
 import yaml
@@ -106,14 +106,8 @@ def test_simple_case(basepython):
         assert expected == includes
 
 
-@pytest.mark.parametrize("custom_target1", (tox2travis.TOX_CPYTHONS +
-                                            tox2travis.TOX_JYTHONS +
-                                            tox2travis.TOX_PYPYS +
-                                            ["python_version_not_in_travis"]))
-@pytest.mark.parametrize("custom_target2", (tox2travis.TOX_CPYTHONS +
-                                            tox2travis.TOX_JYTHONS +
-                                            tox2travis.TOX_PYPYS +
-                                            ["python_version_not_in_travis"]))
+@pytest.mark.parametrize("custom_target1", (tox2travis.ALL_KNOWN_BASEPYTHONS))
+@pytest.mark.parametrize("custom_target2", (tox2travis.ALL_KNOWN_BASEPYTHONS))
 def test_custom_mapping(custom_target1, custom_target2):
     runner = CliRunner()
 
@@ -134,12 +128,13 @@ def test_custom_mapping(custom_target1, custom_target2):
         includes = content["matrix"]["include"]
         assert includes is None, includes
 
+        print(custom_target2)
         result = runner.invoke(main, ["--custom-mapping",
                                       "pythonsomething.something",
-                                      custom_target1,
+                                      custom_target1.travis_version,
                                       "--custom-mapping",
                                       "pythonsomething.somethingelse",
-                                      custom_target2])
+                                      custom_target2.travis_version])
 
         assert result.exit_code == 0, result.output
 
@@ -148,7 +143,7 @@ def test_custom_mapping(custom_target1, custom_target2):
         assert includes is not None, content
         assert len(includes) == 2, includes
 
-        expected = [{"env": "TOXENV=flake8", "python": custom_target1},
-                    {"env": "TOXENV=test", "python": custom_target2}]
+        expected = [{"python": custom_target1.travis_version, "env": "TOXENV=flake8"},
+                    {"python": custom_target2.travis_version, "env": "TOXENV=test"}]
 
         assert expected == includes
