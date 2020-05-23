@@ -18,6 +18,7 @@ from copy import deepcopy
 @click.option("--fallback-python", type=click.Choice(ALL_VALID_FALLBACKS))
 @click.option("--output",
               default=ALL_WRITERS[0].name,
+              show_default=True,
               type=click.Choice([w.name for w in ALL_WRITERS]))
 @click.option("--verbose", is_flag=True)
 # @click.option("outfile", type=click.File("w"), default=TRAVIS_YAML)
