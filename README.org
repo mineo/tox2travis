@@ -1,5 +1,6 @@
 #+OPTIONS: toc:nil html-postamble:nil num:nil
 [[https://travis-ci.org/mineo/tox2travis][https://travis-ci.org/mineo/tox2travis.svg?branch=master]]
+[[https://github.com/mineo/tox2travis/actions][https://github.com/mineo/tox2travis/workflows/Python%20package/badge.svg]]
 
 * tox2travis
 
