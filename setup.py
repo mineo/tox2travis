@@ -20,6 +20,7 @@ setup(name="tox2travis",
       description="Automatically generate .travis.yml from tox.ini",
       long_description=open("README.txt", encoding="utf-8").read(),
       install_requires=["click", "tox"],
+      python_requires='>=3.6',
       entry_points='''
       [console_scripts]
       tox2travis=tox2travis.__main__:main
@@ -29,5 +30,5 @@ setup(name="tox2travis",
       extras_require={
           'docs': ['sphinx']
       },
-      tests_require=["pytest", "pyyaml"]
+      tests_require=["pytest", "pytest-snapshot", "pyyaml"]
       )

@@ -1,0 +1,13 @@
+language: python
+cache: pip
+dist: xenial
+matrix:
+  include:
+  - python: "pypy2.7-6.0"
+    env: TOXENV=flake8
+  - python: "2.7"
+    env: TOXENV=test
+install:
+  - travis_retry pip install tox
+script:
+  - travis_retry tox
