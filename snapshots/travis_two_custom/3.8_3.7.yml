@@ -4,6 +4,8 @@ dist: xenial
 matrix:
   include:
   - python: "3.8"
+    env: TOXENV=flake8
+  - python: "3.7"
     env: TOXENV=test
 install:
   - travis_retry pip install tox
