@@ -294,4 +294,4 @@ class TravisWriter(WriterBase):
                                            toxenv=environment.envname)
 
 
-ALL_WRITERS = [ActionsWriter, TravisWriter]
+ALL_WRITERS = [TravisWriter, ActionsWriter]
