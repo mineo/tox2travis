@@ -16,6 +16,8 @@ jobs:
             env: py37
           - python-version: "3.8"
             env: py38
+          - python-version: "pypy3"
+            env: pypy3
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
