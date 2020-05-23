@@ -196,6 +196,12 @@ class ActionsWriter(WriterBase):
               uses: actions/setup-python@v2
               with:
                 python-version: ${{ matrix.python-version }}
+            - uses: actions/cache@v1
+              with:
+                path: ~/.cache/pip
+                key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+                restore-keys: |
+                  ${{ runner.os }}-pip-
             - name: Install dependencies
               run: |
                 python -m pip install --upgrade pip
