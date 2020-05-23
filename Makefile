@@ -10,7 +10,7 @@ sanity:
 .PHONY: update-snapshots
 update-snapshots: sanity
 	rm -rf snapshots/*
-	pytest --snapshot-update
+	pytest --snapshot-update || :
 	git add snapshots
 	git commit -m "Update test snapshots"
 
