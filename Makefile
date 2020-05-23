@@ -20,7 +20,7 @@ update-snapshots: sanity
 
 .PHONY: .travis.yml
 .travis.yml:
-	tox2travis --fallback-python=python3.7
+	tox2travis --fallback-python=python3.7 --output=travis
 
 .PHONY: dogfood
 dogfood: self
