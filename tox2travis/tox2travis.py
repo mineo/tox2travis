@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Copyright © 2017, 2018, 2019 Wieland Hoffmann
+# Copyright © 2017, 2018, 2019, 2020 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import logging
 
 
+from contextlib import ExitStack
+from os import makedirs
+from os.path import dirname
 from textwrap import dedent, indent
 from tox.config import parseconfig
 
@@ -20,15 +23,17 @@ class UnkownBasePython(Exception):
 class BasePython:
     """A base python version in tox and travis and its environments."""
 
-    def __init__(self, tox_version, travis_version, environments=None):  # noqa: D400,E501
+    def __init__(self, tox_version, travis_version, environments=None, actions_version=None):  # noqa: D400,E501
         """
         :param str tox_version:
         :param str travis_version:
         :param [tox.config.TestenvConfig] environments:
+        :param str actions_version:
         """
         self.tox_version = tox_version
         self.travis_version = travis_version
         self._environments = environments or []
+        self.actions_version = actions_version or travis_version
 
     def add_environment(self, environment):
         """Add a new environment to this python version.
@@ -81,30 +86,22 @@ class BasePython:
 
 #: All CPython versions known to tox
 TOX_CPYTHONS = ["2.6", "2.7", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7"]
-#: All Jython versions known to tox
-TOX_JYTHONS  = ["jython"]  # noqa: E221
 #: All pypy versions known to tox and travis
 # https://docs.travis-ci.com/user/reference/xenial/#python-support
-TOX_PYPYS    = [BasePython("pypy", "pypy2.7-6.0"), BasePython("pypy2", "pypy2.7-6.0"), BasePython("pypy3", "pypy3.5-6.0")]  # noqa: E221,E501
+TOX_PYPYS    = [BasePython("pypy", "pypy2.7-6.0"), BasePython("pypy2", "pypy2.7-6.0", actions_version="pypy2"), BasePython("pypy3", "pypy3.5-6.0", actions_version="pypy3")]  # noqa: E221,E501
 #: All Python development versions supported by tox and travis
-TOX_DEVPTHONS = [BasePython("python3.8", "3.8-dev")]
+TOX_DEVPTHONS = [BasePython("python3.8", "3.8-dev", actions_version="3.8")]
 
 ALL_KNOWN_BASEPYTHONS = [
     BasePython("python{version}".format(version=version), version)
     for version in TOX_CPYTHONS
 ]
 
-ALL_KNOWN_BASEPYTHONS.extend(BasePython(version, version)
-                             for version in TOX_JYTHONS)
 ALL_KNOWN_BASEPYTHONS.extend(TOX_PYPYS)
 ALL_KNOWN_BASEPYTHONS.extend(TOX_DEVPTHONS)
 
 #: All strings that can be used as a fallback
 ALL_VALID_FALLBACKS = [python.tox_version for python in ALL_KNOWN_BASEPYTHONS]
-
-
-#: The default travis YAML file name
-TRAVIS_YAML = ".travis.yml"
 
 
 def get_all_environments(toxini=None):
@@ -151,54 +148,144 @@ def fill_basepythons(basepythons, envconfigs, fallback_basepython=None):  # noqa
                 logging.debug("%s uses %s (fallback: %s)", envconfig.envname,
                               basepython, bp.travis_version)
                 bp.add_environment(envconfig)
-
     return list(basepythons.values())
 
 
-def travis_yml_header():
-    """Return the .travis.yml header."""
-    return dedent("""\
-    language: python
-    cache: pip
-    dist: xenial
-    matrix:
-      include:
-    """)
+class WriterBase(ExitStack):
+    """Base class for all writers, allowing use as a context manager."""
+
+    def __init__(self):
+        super().__init__()
+        self.outfile = None
+
+    def __enter__(self):
+        super().__enter__()
+        dir_ = dirname(self.filename)
+        if dir_:
+            makedirs(dir_, exist_ok=True)
+        self.outfile = self.enter_context(open(self.filename, "w"))
+        return self
 
 
-def travis_yml_footer():
-    """Return the .travis.yml footer."""
-    return dedent("""\
-    install:
-      - travis_retry pip install tox
-    script:
-      - travis_retry tox
-    """)
+class ActionsWriter(WriterBase):
+    """A class for writing a GitHub actions yaml file."""
+
+    filename = ".github/workflows/tox.yml"
+    name = "actions"
+
+    def header(self):
+        """Write the tox.yml header."""
+        text = dedent("""\
+        name: Python package
+        on: [push]
+        jobs:
+          build:
+            runs-on: ubuntu-latest
+            strategy:
+              matrix:
+                include:
+        """)
+        self.outfile.write(text)
+
+    def footer(self):
+        """Write the tox.yml footer."""
+        text = dedent("""\
+            steps:
+            - uses: actions/checkout@v2
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v2
+              with:
+                python-version: ${{ matrix.python-version }}
+            - name: Install dependencies
+              run: |
+                python -m pip install --upgrade pip
+                pip install tox
+            - name: Test with tox
+              run: |
+                tox -e ${{ matrix.env }}
+        """)
+        indented = indent(text, ' ' * 4)
+        self.outfile.write(indented)
+
+    def generate_matrix_specifications(self, basepythons):
+        """Write the matrix entries for all `basepythons`.
+
+        :type basepythons: [BasePython]
+        :rtype: [str]
+        """
+        for basepython in basepythons:
+            for entry in self.generate_specs_for_basepython(basepython):
+                indented = indent(entry, ' ' * 10)
+                self.outfile.write(indented)
+
+    def generate_specs_for_basepython(self, basepython):
+        """Write the matrix entries for `basepython`.
+
+        :type basepython: BasePython
+        :rtype: [str]
+        """
+        single_entry_spec = dedent("""\
+        - python-version: "{python}"
+          env: {toxenv}
+        """)
+        actions_version = basepython.actions_version
+        for environment in basepython.environments:
+            yield single_entry_spec.format(python=actions_version,
+                                           toxenv=environment.envname)
 
 
-def generate_matrix_specification(basepythons):
-    """Generate the matrix entries for all `basepythons`.
+class TravisWriter(WriterBase):
+    """A class for writing a .travis.yml file."""
 
-    :type basepythons: [BasePython]
-    :rtype: [str]
-    """
-    for basepython in basepythons:
-        for entry in generate_specs_for_basepython(basepython):
-            indented = indent(entry, '  ')
-            yield indented
+    filename = ".travis.yml"
+    name = "travis"
+
+    def header(self):
+        """Write the .travis.yml header."""
+        text = dedent("""\
+        language: python
+        cache: pip
+        dist: xenial
+        matrix:
+          include:
+        """)
+        self.outfile.write(text)
+
+    def footer(self):
+        """Write the .travis.yml footer."""
+        text = dedent("""\
+        install:
+          - travis_retry pip install tox
+        script:
+          - travis_retry tox
+        """)
+        self.outfile.write(text)
+
+    def generate_matrix_specifications(self, basepythons):
+        """Write the matrix entries for all `basepythons`.
+
+        :type basepythons: [BasePython]
+        :rtype: [str]
+        """
+        for basepython in basepythons:
+            for entry in self.generate_specs_for_basepython(basepython):
+                indented = indent(entry, '  ')
+                self.outfile.write(indented)
+
+    def generate_specs_for_basepython(self, basepython):
+        """Write the matrix entries for `basepython`.
+
+        :type basepython: BasePython
+        :rtype: [str]
+        """
+        single_entry_spec = dedent("""\
+        - python: "{python}"
+          env: TOXENV={toxenv}
+        """)
+        travis_version = basepython.travis_version
+        for environment in basepython.environments:
+            yield single_entry_spec.format(python=travis_version,
+                                           toxenv=environment.envname)
 
 
-def generate_specs_for_basepython(basepython):
-    """Return the matrix entries for `basepython`.
-
-    :type basepython: BasePython
-    :rtype: [str]
-    """
-    single_entry_spec = dedent("""\
-    - python: "{python}"
-      env: TOXENV={toxenv}
-    """)
-    travis_version = basepython.travis_version
-    for environment in basepython.environments:
-        yield single_entry_spec.format(python=travis_version,
-                                       toxenv=environment.envname)
+ALL_WRITERS = [ActionsWriter, TravisWriter]

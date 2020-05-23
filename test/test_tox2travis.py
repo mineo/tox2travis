@@ -15,6 +15,11 @@ from tox2travis import tox2travis
 from tox2travis.__main__ import main
 
 
+@pytest.fixture(params=tox2travis.ALL_WRITERS)
+def output(request):
+    return request.param
+
+
 def write_file(tmpdir, filename, content):
     """
     :type directory: py.path.local
@@ -25,20 +30,13 @@ def write_file(tmpdir, filename, content):
     return file_
 
 
-def read_travis_yml(tmpdir):
+def read_file(tmpdir, filename):
     """
     :param str tmpdir:
     """
-    filename = join(tmpdir, tox2travis.TRAVIS_YAML)
+    filename = join(tmpdir, filename)
     with open(filename, "r") as fp:
         return fp.read()
-
-
-def load_travis_yml(tmpdir):
-    """
-    :param str tmpdir:
-    """
-    return yaml.load(read_travis_yml(tmpdir))
 
 
 def get_toxini_path_with_content(tmpdir, content):
@@ -92,7 +90,7 @@ def test_fallback_is_used(basepythons, tmpdir, fallback):
 
 
 @pytest.mark.parametrize("basepython", tox2travis.ALL_KNOWN_BASEPYTHONS)
-def test_simple_case(basepython, snapshot):
+def test_simple_case(basepython, output, snapshot):
     runner = CliRunner()
     actual = None
 
@@ -105,17 +103,17 @@ def test_simple_case(basepython, snapshot):
         basepython={python}
         """.format(python=basepython.tox_version)))
 
-        result = runner.invoke(main)
+        result = runner.invoke(main, f"--output={output.name}")
         assert result.exit_code == 0, result.output
 
-        actual = read_travis_yml(this_dir)
+        actual = read_file(this_dir, output.filename)
 
-    snapshot.snapshot_dir = f"snapshots/travis_simple"
+    snapshot.snapshot_dir = f"snapshots/{output.name}_simple"
     snapshot.assert_match(actual, f"{basepython.tox_version}")
 
 @pytest.mark.parametrize("custom_target1", (tox2travis.ALL_KNOWN_BASEPYTHONS))
 @pytest.mark.parametrize("custom_target2", (tox2travis.ALL_KNOWN_BASEPYTHONS))
-def test_custom_mapping(custom_target1, custom_target2, snapshot):
+def test_custom_mapping_unspecified(custom_target1, custom_target2, output, snapshot):
     runner = CliRunner()
     actual = None
 
@@ -130,21 +128,40 @@ def test_custom_mapping(custom_target1, custom_target2, snapshot):
         basepython=pythonsomething.somethingelse
         """))
 
-        result = runner.invoke(main)
+        result = runner.invoke(main, f"--output={output.name}")
         assert result.exit_code == 0, result.output
-        content = load_travis_yml(this_dir)
-        includes = content["matrix"]["include"]
-        assert includes is None, includes
+        actual = read_file(this_dir, output.filename)
+
+    snapshot.snapshot_dir = f"snapshots/{output.name}_two_custom_unspecified"
+    snapshot.assert_match(actual, f"{custom_target1.travis_version}_{custom_target2.travis_version}.yml")
+
+@pytest.mark.parametrize("custom_target1", (tox2travis.ALL_KNOWN_BASEPYTHONS))
+@pytest.mark.parametrize("custom_target2", (tox2travis.ALL_KNOWN_BASEPYTHONS))
+def test_custom_mapping(custom_target1, custom_target2, output, snapshot):
+    runner = CliRunner()
+    actual = None
+
+    with runner.isolated_filesystem():
+        this_dir = Path(getcwd())
+        get_toxini_path_with_content(this_dir, dedent("""\
+        [tox]
+        envlist = flake8,test
+        [testenv:flake8]
+        basepython=pythonsomething.something
+        [testenv:test]
+        basepython=pythonsomething.somethingelse
+        """))
 
         result = runner.invoke(main, ["--custom-mapping",
                                       "pythonsomething.something",
                                       custom_target1.travis_version,
                                       "--custom-mapping",
                                       "pythonsomething.somethingelse",
-                                      custom_target2.travis_version])
+                                      custom_target2.travis_version,
+                                      f"--output={output.name}"])
 
         assert result.exit_code == 0, result.output
-        actual = read_travis_yml(this_dir)
+        actual = read_file(this_dir, output.filename)
 
-    snapshot.snapshot_dir = f"snapshots/travis_two_custom"
+    snapshot.snapshot_dir = f"snapshots/{output.name}_two_custom"
     snapshot.assert_match(actual, f"{custom_target1.travis_version}_{custom_target2.travis_version}.yml")

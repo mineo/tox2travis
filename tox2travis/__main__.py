@@ -1,24 +1,27 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright © 2017, 2018 Wieland Hoffmann
+# Copyright © 2017, 2018, 2020 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import click
 import logging
 
 
-from .tox2travis import (generate_matrix_specification, get_all_environments,
-                         fill_basepythons, travis_yml_header, travis_yml_footer,
+from .tox2travis import (get_all_environments,
+                         fill_basepythons,
                          ALL_VALID_FALLBACKS, BasePython, ALL_KNOWN_BASEPYTHONS,
-                         TRAVIS_YAML)
+                         ALL_WRITERS)
 from copy import deepcopy
 
 
 @click.command()
 @click.option("--custom-mapping", nargs=2, multiple=True)
 @click.option("--fallback-python", type=click.Choice(ALL_VALID_FALLBACKS))
+@click.option("--output",
+              default=ALL_WRITERS[0].name,
+              type=click.Choice([w.name for w in ALL_WRITERS]))
 @click.option("--verbose", is_flag=True)
-@click.argument("outfile", type=click.File("w"), default=TRAVIS_YAML)
-def main(custom_mapping, fallback_python, verbose, outfile):  # noqa: D103
+# @click.option("outfile", type=click.File("w"), default=TRAVIS_YAML)
+def main(custom_mapping, fallback_python, output, verbose):  # noqa: D103
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
     else:
@@ -33,10 +36,16 @@ def main(custom_mapping, fallback_python, verbose, outfile):  # noqa: D103
 
     basepythons = fill_basepythons(basepythons, envs, fallback_python)
 
-    outfile.write(travis_yml_header())
-    for matrix_entry in generate_matrix_specification(basepythons):
-        outfile.write(matrix_entry)
-    outfile.write(travis_yml_footer())
+    writer = None
+    for w in ALL_WRITERS:
+        if w.name == output:
+            writer = w
+            break
+
+    with w() as writer:
+        writer.header()
+        writer.generate_matrix_specifications(basepythons)
+        writer.footer()
 
 
 if __name__ == "__main__":
