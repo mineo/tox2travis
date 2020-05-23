@@ -85,7 +85,7 @@ class BasePython:
 # example py37/python3.7 should map to "3.7-dev" at the time of this writing).
 
 #: All CPython versions known to tox
-TOX_CPYTHONS = ["2.7", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8"]
+TOX_CPYTHONS = ["2.7", "3.5", "3.6", "3.7", "3.8"]
 #: All pypy versions known to tox and travis
 # https://docs.travis-ci.com/user/reference/xenial/#python-support
 TOX_PYPYS    = [BasePython("pypy", "pypy2.7-6.0"), BasePython("pypy2", "pypy2.7-6.0", actions_version="pypy2"), BasePython("pypy3", "pypy3.5-6.0", actions_version="pypy3")]  # noqa: E221,E501
