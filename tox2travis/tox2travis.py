@@ -177,7 +177,7 @@ class ActionsWriter(WriterBase):
         """Write the tox.yml header."""
         text = dedent("""\
         name: Python package
-        on: [push]
+        on: [pull_request, push]
         jobs:
           build:
             runs-on: ubuntu-latest
