@@ -17,7 +17,7 @@ setup(name="tox2travis",
                    "Natural Language :: English",
                    "Operating System :: OS Independent",
                    "Programming Language :: Python :: 3.6"],
-      description="Automatically generate .travis.yml from tox.ini",
+      description="Automatically generate .travis.yml or GitHub actions workflow .yml from tox.ini",  # noqa: E501
       long_description=open("README.md", encoding="utf-8").read(),
       long_description_content_type='text/markdown',
       install_requires=["click", "tox"],
