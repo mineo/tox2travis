@@ -3,7 +3,7 @@ cache: pip
 dist: xenial
 matrix:
   include:
-  - python: "3.8-dev"
+  - python: "3.8"
     env: TOXENV=test
 install:
   - travis_retry pip install tox
