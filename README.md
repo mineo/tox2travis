@@ -15,11 +15,11 @@ to the correct python version on Travis automatically.
 
 If an environment name does not match one of the default environments
 provided by tox, tox2travis will simply ignore it. To specify a python
-version for such environments, use the `–fallback-python` command line
+version for such environments, use the `--fallback-python` command line
 argument:
 
 ```
-tox2travis –fallback-python pythonx.y
+tox2travis --fallback-python pythonx.y
 ```
 
 The value passed to the argument must be a valid
@@ -30,16 +30,16 @@ The value passed to the argument must be a valid
 If environments specified in `tox.ini` use a
 [basepython](https://tox.readthedocs.io/en/latest/config.html#conf-basepython)
 that can not be automatically mapped to one of the supported python
-versions on Travis, use the `–custom-mapping` command line argument:
+versions on Travis, use the `--custom-mapping` command line argument:
 
 ```
-tox2travis –custom-mapping <basepython> <travis-python>
+tox2travis --custom-mapping <basepython> <travis-python>
 ```
 
 ## GitHub Actions
 
 Despite the name, `tox2travis` can also generate a configuration file
 for [GitHub Actions](https://github.com/features/actions). Simply call
-`tox2travis –output=actions` in a directory that contains a
+`tox2travis --output=actions` in a directory that contains a
 `tox.ini` file. A new file `.github/workflows/tox.yml` will be
 generated.
