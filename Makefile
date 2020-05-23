@@ -1,5 +1,5 @@
 .PHONY: all
-all: update-snapshots
+all: self
 
 .PHONY: sanity
 sanity:
@@ -13,3 +13,17 @@ update-snapshots: sanity
 	pytest --snapshot-update
 	git add snapshots
 	git commit -m "Update test snapshots"
+
+.PHONY: .github/workflows/tox.yml
+.github/workflows/tox.yml:
+	tox2travis --fallback-python=python3.7 --output=actions
+
+.PHONY: .travis.yml
+.travis.yml:
+	tox2travis --fallback-python=python3.7
+
+.PHONY: dogfood
+dogfood: self
+
+.PHONY: self
+self: .travis.yml .github/workflows/tox.yml
