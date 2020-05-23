@@ -25,13 +25,20 @@ def write_file(tmpdir, filename, content):
     return file_
 
 
-def load_travis_yml(tmpdir):
+def read_travis_yml(tmpdir):
     """
     :param str tmpdir:
     """
     filename = join(tmpdir, tox2travis.TRAVIS_YAML)
     with open(filename, "r") as fp:
-        return yaml.load(fp)
+        return fp.read()
+
+
+def load_travis_yml(tmpdir):
+    """
+    :param str tmpdir:
+    """
+    return yaml.load(read_travis_yml(tmpdir))
 
 
 def get_toxini_path_with_content(tmpdir, content):
@@ -85,8 +92,9 @@ def test_fallback_is_used(basepythons, tmpdir, fallback):
 
 
 @pytest.mark.parametrize("basepython", tox2travis.ALL_KNOWN_BASEPYTHONS)
-def test_simple_case(basepython):
+def test_simple_case(basepython, snapshot):
     runner = CliRunner()
+    actual = None
 
     with runner.isolated_filesystem():
         this_dir = Path(getcwd())
@@ -100,16 +108,16 @@ def test_simple_case(basepython):
         result = runner.invoke(main)
         assert result.exit_code == 0, result.output
 
-        content = load_travis_yml(this_dir)
-        includes = content["matrix"]["include"]
-        expected = [{"env": "TOXENV=test", "python": basepython.travis_version}]
-        assert expected == includes
+        actual = read_travis_yml(this_dir)
 
+    snapshot.snapshot_dir = f"snapshots/travis_simple"
+    snapshot.assert_match(actual, f"{basepython.tox_version}")
 
 @pytest.mark.parametrize("custom_target1", (tox2travis.ALL_KNOWN_BASEPYTHONS))
 @pytest.mark.parametrize("custom_target2", (tox2travis.ALL_KNOWN_BASEPYTHONS))
-def test_custom_mapping(custom_target1, custom_target2):
+def test_custom_mapping(custom_target1, custom_target2, snapshot):
     runner = CliRunner()
+    actual = None
 
     with runner.isolated_filesystem():
         this_dir = Path(getcwd())
@@ -128,7 +136,6 @@ def test_custom_mapping(custom_target1, custom_target2):
         includes = content["matrix"]["include"]
         assert includes is None, includes
 
-        print(custom_target2)
         result = runner.invoke(main, ["--custom-mapping",
                                       "pythonsomething.something",
                                       custom_target1.travis_version,
@@ -137,13 +144,7 @@ def test_custom_mapping(custom_target1, custom_target2):
                                       custom_target2.travis_version])
 
         assert result.exit_code == 0, result.output
+        actual = read_travis_yml(this_dir)
 
-        content = load_travis_yml(this_dir)
-        includes = content["matrix"]["include"]
-        assert includes is not None, content
-        assert len(includes) == 2, includes
-
-        expected = [{"python": custom_target1.travis_version, "env": "TOXENV=flake8"},
-                    {"python": custom_target2.travis_version, "env": "TOXENV=test"}]
-
-        assert expected == includes
+    snapshot.snapshot_dir = f"snapshots/travis_two_custom"
+    snapshot.assert_match(actual, f"{custom_target1.travis_version}_{custom_target2.travis_version}.yml")
