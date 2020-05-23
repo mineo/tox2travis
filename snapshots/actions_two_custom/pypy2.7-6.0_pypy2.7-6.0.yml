@@ -1,5 +1,5 @@
-name: Python package
-on: [push]
+name: Run tox
+on: [pull_request, push]
 jobs:
   build:
     runs-on: ubuntu-latest
