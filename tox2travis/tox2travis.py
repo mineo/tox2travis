@@ -209,7 +209,7 @@ class ActionsWriter(WriterBase):
             - name: Test with tox
               run: |
                 tox -e ${{ matrix.env }}
-        """)
+        """)  # noqa: E501
         indented = indent(text, ' ' * 4)
         self.outfile.write(indented)
 
