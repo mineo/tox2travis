@@ -3,7 +3,6 @@
 # Copyright © 2017, 2018, 2019 Wieland Hoffmann
 # License: MIT, see LICENSE for details
 import pytest
-import yaml
 
 
 from click.testing import CliRunner
