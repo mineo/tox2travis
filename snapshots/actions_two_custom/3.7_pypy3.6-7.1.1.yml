@@ -6,9 +6,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - python-version: "2.7"
+          - python-version: "3.7"
             env: flake8
-          - python-version: "pypy3.5-6.0"
+          - python-version: "pypy3.6-7.1.1"
             env: test
     steps:
     - uses: actions/checkout@v2

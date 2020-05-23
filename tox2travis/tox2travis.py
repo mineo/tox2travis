@@ -88,7 +88,7 @@ class BasePython:
 TOX_CPYTHONS = ["2.7", "3.5", "3.6", "3.7", "3.8"]
 #: All pypy versions known to tox and travis
 # https://docs.travis-ci.com/user/reference/xenial/#python-support
-TOX_PYPYS    = [BasePython("pypy", "pypy2.7-6.0"), BasePython("pypy2", "pypy2.7-6.0", actions_version="pypy2"), BasePython("pypy3", "pypy3.5-6.0", actions_version="pypy3")]  # noqa: E221,E501
+TOX_PYPYS    = [BasePython("pypy", "pypy2.7-6.0"), BasePython("pypy2", "pypy2.7-6.0", actions_version="pypy2"), BasePython("pypy3", "pypy3.6-7.1.1", actions_version="pypy3")]  # noqa: E221,E501
 #: All Python development versions supported by tox and travis
 TOX_DEVPTHONS = []
 
