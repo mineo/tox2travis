@@ -1,6 +1,6 @@
 # tox2travis
 
-![Python package](https://github.com/mineo/tox2travis/workflows/Python%20package/badge.svg)
+![Run tox](https://github.com/mineo/tox2travis/workflows/Run%20tox/badge.svg)
 [![Build Status](https://travis-ci.org/mineo/tox2travis.svg?branch=master)](https://travis-ci.org/mineo/tox2travis)
 
 After installing, simply call `tox2travis` in a directory that
